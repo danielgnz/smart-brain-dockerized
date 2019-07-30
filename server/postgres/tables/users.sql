@@ -1,0 +1,11 @@
+BEGIN TRANSACTION;
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    user_name VARCHAR(100),
+    email TEXT UNIQUE NOT NULL,
+    score BIGINT DEFAULT 0,
+    joined TIMESTAMP NOT NULL
+);
+
+COMMIT;

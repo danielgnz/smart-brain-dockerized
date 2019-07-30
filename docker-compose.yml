@@ -1,0 +1,55 @@
+version: '3.7'
+
+services:
+
+#################################
+#   SERVER Container
+################################
+  server:
+    container_name: smart-brain-server
+    build: ./server
+    working_dir: /usr/share/smart-brain/server    
+    environment:
+      POSTGRES_URI: postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
+      APP_SERVER_PORT: ${APP_SERVER_PORT}
+    ports:
+      - ${APP_SERVER_PORT}:${APP_SERVER_PORT}
+    expose: 
+      - ${APP_SERVER_PORT}   
+    volumes:
+      - ./server:/usr/share/smart-brain/server
+    links: 
+      - postgres
+    command: yarn dev
+
+#################################
+#   CLIENT Container
+################################
+  client:
+    container_name: smart-brain-client
+    build: ./client
+    working_dir: /usr/share/smart-brain/client
+    environment:
+      - REACT_APP_PORT: ${REACT_APP_PORT}    
+    ports:
+      - ${REACT_APP_PORT}:${REACT_APP_PORT}
+    expose: 
+      - ${REACT_APP_PORT}   
+    volumes:
+      - ./client:/usr/share/smart-brain/client
+    links: 
+      - server
+    command: yarn start
+
+#################################
+#   Postgres Container
+################################
+  postgres:
+    build: ./server/postgres
+    environment: 
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_HOST: ${DB_HOST}
+    ports:
+      - ${DB_PORT}:${DB_PORT}
